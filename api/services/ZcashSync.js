@@ -1,5 +1,33 @@
 var async = require('async');
 
+
+var getBlock = function blockByIndex(index) {
+  return new Promise(function(resolve, reject){
+    Block
+      .findOne({height: index})
+      .then(function(block){
+        if (typeof block !== 'undefined') return block;
+        // Block from remote
+        console.log('[Sync] Block %d not found, requesting it', index);
+        return ZcashExplorer.block(index).then(function(newBlock) {
+          newBlock._id = newBlock.height;
+          return Block.create(newBlock);
+        });
+      })
+      .then(function(block) {
+        resolve(block);
+      })
+      .catch(function(err) {
+        //console.log('[Sync] Check if block %d is cached: err ', err);
+        reject(err);
+      });
+  });
+};
+
+var getTx = function transactionByHash(hash) {
+
+};
+
 module.exports.sync = function() {
 
   var chainHeight = 0;
@@ -10,30 +38,17 @@ module.exports.sync = function() {
     .then(function(network){
       console.log('[ZcashNetwork] info %s', JSON.stringify(network, null, 4));
       //console.log('[ZcashNetwork] block height %d', network.blockNumber);
-      chainHeight = 3;//network.blockNumber;
+      chainHeight = 4;//network.blockNumber;
       async.eachOfSeries(new Array(chainHeight), function iterateBlock(dummy, index, next){
         //console.log('[IterateBlock] index %d', index);
         // check if block exists
-        Block
-          .findOne({height: index})
+        getBlock(index)
           .then(function(block){
-            if (typeof block === 'undefined') {
-              console.log('[Sync] Requesting block %d', index);
-              ZcashExplorer.blocks(index).then(function(blocks){
-                console.log('[API blocks] %s ', JSON.stringify(blocks,null, 4));
-                next();
-                return null;
-              })
-            } else {
-              console.log('[Sync] Block %d is cached', index);
-              next();
-              return null;
-            }
+            console.log('[Sync] block %s', JSON.stringify(block, null, 4));
+            return next();
           })
           .catch(function(err){
-            console.log('[Sync] Check if block %d is cached: err ', err);
-            next();
-            return null;
+            return next(err);
           });
       }, function done(err) {
         if (err) return console.log('[Sync] err ', err);
