@@ -22,6 +22,14 @@ module.exports = {
       return blocks[0];
     });
   },
+  transaction: function transaction(hash) {
+    var options = {
+      url: apiBase + 'transactions/'+hash,
+      json: true
+    };
+    console.log('[API Tx] requesting %s', options.url);
+    return rp(options);
+  },
   info: function() {
     var options = {
       url: apiBase + 'network',

@@ -8,7 +8,10 @@
 module.exports = {
 
   attributes: {
-
+    blockId: {
+      model: 'Block',
+      required: true
+    }
   }
 };
 
