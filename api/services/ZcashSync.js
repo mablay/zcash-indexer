@@ -18,9 +18,18 @@ var getTx = function getTransaction(hash, block) {
     if (typeof tx !== 'undefined') return tx;
     // Tx from remote
     console.log('[getTx] Tx %s not found, requesting it', hash);
-    return ZcashExplorer.transaction(hash).then(function(newTx) {
-      newTx.blockId = block;
-      return Transaction.create(newTx);
+    return new Promise(function(resolve, reject){
+      ZcashExplorer.transaction(hash).then(function(newTx) {
+        newTx.blockId = block;
+        Transaction.create(newTx).then(resolve).catch(reject);
+      }).catch(function(err){
+        console.log('[getTx] Tx %s missing', hash);
+        newTx = {
+          blockId: block,
+          type: 'missing'
+        };
+        Transaction.create(newTx).then(resolve).catch(reject);
+      });
     });
   });
 };
@@ -36,6 +45,7 @@ var consumeTxs = function consumeTransactions(block) {
       }).catch(function(err){
         console.log('[consumeTx] Error ', err.statusCode);
         nextTx();
+        return null;
       });
     }, function doneTxs(err){
       if (err) return reject(err);
@@ -77,12 +87,5 @@ module.exports.sync = function() {
       return null;
     });
 
-  // 2. Iterate blocks 1 .. height
-
-  // 2.1. Skip existing blocks
-  // 2.2. Request new blocks and their tx
-
-  // 3. Log "done with block height: N"
-  console.log('[ZeroChainSync] done at height %d', chainHeight);
 };
 
