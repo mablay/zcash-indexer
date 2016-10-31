@@ -12,6 +12,17 @@ module.exports = {
       model: 'Block',
       required: true
     }
+  },
+
+  reward: function(){
+    console.log('[Reward] Calculate ...');
+    Transaction.find({type: "minerReward"}).then(function(txs) {
+      var sum = txs.reduce(function(sum, tx, index){
+        sum += tx.value;
+      }, 0.0);
+      console.log('[Reward] miner reward %s', sum);
+    });
+    return null;
   }
 };
 

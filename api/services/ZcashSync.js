@@ -26,6 +26,7 @@ var getTx = function getTransaction(hash, block) {
         console.log('[getTx] Tx %s missing', hash);
         newTx = {
           blockId: block,
+          hash: hash,
           type: 'missing'
         };
         Transaction.create(newTx).then(resolve).catch(reject);
