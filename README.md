@@ -23,7 +23,9 @@ Extra libs: async, request-promise
 
     // Make sure to use either sails filedb or have mongo running.
     npm install
-    npm start
+    sails console
+    // After sails has started into console activate the sync process
+    ZcashSync.sync();
 
 ## Debugging
 

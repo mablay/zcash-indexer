@@ -27,7 +27,7 @@ module.exports = {
       url: apiBase + 'transactions/'+hash,
       json: true
     };
-    console.log('[API Tx] requesting %s', options.url);
+    //console.log('[API Tx] requesting %s', options.url);
     return rp(options);
   },
   info: function() {

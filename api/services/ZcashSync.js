@@ -23,7 +23,7 @@ var getTx = function getTransaction(hash, block) {
         newTx.blockId = block;
         Transaction.create(newTx).then(resolve).catch(reject);
       }).catch(function(err){
-        console.log('[getTx] Tx %s missing', hash);
+        //console.log('[getTx] Tx %s missing', hash);
         newTx = {
           blockId: block,
           hash: hash,
